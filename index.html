@@ -6,17 +6,15 @@
   <title>Work Out Level Up</title>
   
   <style>
-    /* 1. Warna Dasar & Layout Utama */
     :root {
-      --bg-main: #DCE2E9; /* Abu-abu kebiruan dari gambar referensi */
+      --bg-main: #DCE2E9;
       --card-bg: #FFFFFF;
       --text-title: #1E293B;
       --text-desc: #64748B;
       --dot-empty: #E2E8F0;
       --text-dot-empty: #94A3B8;
 
-      /* Warna Aksen per Level */
-      --accent-pemula: #2DD4BF;   /* Cyan / Toska */
+      --accent-pemula: #2DD4BF;   /* Cyan */
       --accent-menengah: #FB923C; /* Oranye */
       --accent-pro: #C084FC;      /* Ungu */
     }
@@ -25,58 +23,59 @@
       background-color: var(--bg-main);
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 40px 20px;
+      padding: 20px 12px;
     }
 
-    /* Container Kanban 3 Kolom */
+    /* Container Kanban Board */
     .kanban-board {
       display: flex;
-      gap: 20px;
+      gap: 16px;
       justify-content: center;
-      flex-wrap: wrap; /* Agar responsif jika dibuka di layar HP */
+      flex-wrap: wrap;
       max-width: 1100px;
       margin: 0 auto;
     }
 
-    /* 2. Kartu Level Kanban */
     .kanban-card {
       background-color: var(--card-bg);
       border-radius: 16px;
-      padding: 20px;
-      width: 300px;
+      padding: 18px;
+      width: 100%;
+      max-width: 320px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
+      box-sizing: border-box;
     }
 
-    /* No 1: Tag Judul */
+    /* Tag Judul Level */
     .card-tag {
       align-self: flex-start;
-      padding: 6px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       color: #FFFFFF;
     }
     .card-tag.pemula { background-color: var(--accent-pemula); }
     .card-tag.menengah { background-color: var(--accent-menengah); }
     .card-tag.pro { background-color: var(--accent-pro); }
 
-    /* No 2: Deskripsi Level */
+    /* Deskripsi 1 Kalimat To The Point */
     .card-desc {
       color: var(--text-desc);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.4;
       margin: 0;
-      min-height: 55px; /* Menjaga tinggi deskripsi sejajar */
     }
 
-    /* No 4: Progress Bar 15 Bulatan */
-    .progress-container {
+    /* Progress Header (Label & Teks 1/2) */
+    .progress-header {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
     }
 
     .progress-label {
@@ -85,31 +84,63 @@
       color: var(--text-title);
     }
 
-    .dots-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
+    .page-indicator {
+      font-size: 11px;
+      color: var(--text-dot-empty);
+      font-weight: bold;
+    }
+
+    /* Progress Bar 1 Baris Horizontal */
+    .dots-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      overflow-x: auto; /* Bisa di-scroll halus jika layar sangat sempit */
+      padding-bottom: 4px;
+      scroll-behavior: smooth;
+    }
+
+    /* Sembunyikan scrollbar bawaan browser */
+    .dots-row::-webkit-scrollbar {
+      display: none;
     }
 
     .dot {
-      width: 32px;
-      height: 32px;
+      min-width: 28px;
+      height: 28px;
       border-radius: 50%;
       background-color: var(--dot-empty);
       color: var(--text-dot-empty);
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dot.active.pemula { background-color: var(--accent-pemula); color: #FFF; }
+    .dot.active.menengah { background-color: var(--accent-menengah); color: #FFF; }
+    .dot.active.pro { background-color: var(--accent-pro); color: #FFF; }
+
+    /* Tombol Navigasi Next '>' */
+    .dot-nav {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #CBD5E1;
+      color: #475569;
       font-size: 12px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: none;
     }
 
-    /* Status Bulatan Aktif per Level */
-    .dot.active.pemula { background-color: var(--accent-pemula); color: #FFF; }
-    .dot.active.menengah { background-color: var(--accent-menengah); color: #FFF; }
-    .dot.active.pro { background-color: var(--accent-pro); color: #FFF; }
-
-    /* No 5: Tombol Mulai */
+    /* Tombol Mulai */
     .btn-start {
       width: 100%;
       padding: 12px 0;
@@ -119,7 +150,7 @@
       font-size: 14px;
       color: #FFFFFF;
       cursor: pointer;
-      margin-top: auto;
+      margin-top: 6px;
     }
     .btn-start.pemula { background-color: var(--accent-pemula); }
     .btn-start.menengah { background-color: var(--accent-menengah); }
@@ -128,35 +159,20 @@
 </head>
 <body>
 
-  <!-- KANBAN BOARD UTAMA -->
   <div class="kanban-board">
 
     <!-- 1. KARTU PEMULA -->
     <div class="kanban-card">
       <div class="card-tag pemula">PEMULA</div>
-      <p class="card-desc">
-        Fokus membangun kekuatan dasar, kepadatan otot, dan mind-muscle connection. Menyiapkan fondasi tubuh agar stabil melakukan push dan pull.
-      </p>
+      <p class="card-desc">Membangun kekuatan dasar dan stabilitas gerakan push-pull.</p>
 
-      <div class="progress-container">
+      <div class="progress-header">
         <span class="progress-label">Progres Level</span>
-        <div class="dots-grid">
-          <div class="dot active pemula">1</div>
-          <div class="dot active pemula">2</div>
-          <div class="dot active pemula">3</div>
-          <div class="dot">4</div>
-          <div class="dot">5</div>
-          <div class="dot">6</div>
-          <div class="dot">7</div>
-          <div class="dot">8</div>
-          <div class="dot">9</div>
-          <div class="dot">10</div>
-          <div class="dot">11</div>
-          <div class="dot">12</div>
-          <div class="dot">13</div>
-          <div class="dot">14</div>
-          <div class="dot">15</div>
-        </div>
+        <span class="page-indicator" id="page-pemula">1/2</span>
+      </div>
+
+      <div class="dots-row" id="row-pemula">
+        <!-- Generasi Bulatan 1-15 via JavaScript -->
       </div>
 
       <button class="btn-start pemula">Mulai Hari Ke-4</button>
@@ -165,29 +181,15 @@
     <!-- 2. KARTU MENENGAH -->
     <div class="kanban-card">
       <div class="card-tag menengah">MENENGAH</div>
-      <p class="card-desc">
-        Fokus pembentukan otot (hypertrophy) menggunakan gerakan dengan beban tubuh lebih berat seperti dips, decline push-up, dan pull-up.
-      </p>
+      <p class="card-desc">Meningkatkan massa otot (hypertrophy) dengan beban tubuh lebih berat.</p>
 
-      <div class="progress-container">
+      <div class="progress-header">
         <span class="progress-label">Progres Level</span>
-        <div class="dots-grid">
-          <div class="dot">1</div>
-          <div class="dot">2</div>
-          <div class="dot">3</div>
-          <div class="dot">4</div>
-          <div class="dot">5</div>
-          <div class="dot">6</div>
-          <div class="dot">7</div>
-          <div class="dot">8</div>
-          <div class="dot">9</div>
-          <div class="dot">10</div>
-          <div class="dot">11</div>
-          <div class="dot">12</div>
-          <div class="dot">13</div>
-          <div class="dot">14</div>
-          <div class="dot">15</div>
-        </div>
+        <span class="page-indicator" id="page-menengah">1/2</span>
+      </div>
+
+      <div class="dots-row" id="row-menengah">
+        <!-- Generasi Bulatan via JavaScript -->
       </div>
 
       <button class="btn-start menengah">Mulai Hari Ke-1</button>
@@ -196,29 +198,15 @@
     <!-- 3. KARTU PRO -->
     <div class="kanban-card">
       <div class="card-tag pro">PRO</div>
-      <p class="card-desc">
-        Fase penguasaan volume penuh dan ketahanan otot dasar. Gerakan dasar terasa ringan dan tubuh matang untuk masuk ke kalistenik sejati.
-      </p>
+      <p class="card-desc">Mematangkan volume dan ketahanan otot untuk tingkat lanjut.</p>
 
-      <div class="progress-container">
+      <div class="progress-header">
         <span class="progress-label">Progres Level</span>
-        <div class="dots-grid">
-          <div class="dot">1</div>
-          <div class="dot">2</div>
-          <div class="dot">3</div>
-          <div class="dot">4</div>
-          <div class="dot">5</div>
-          <div class="dot">6</div>
-          <div class="dot">7</div>
-          <div class="dot">8</div>
-          <div class="dot">9</div>
-          <div class="dot">10</div>
-          <div class="dot">11</div>
-          <div class="dot">12</div>
-          <div class="dot">13</div>
-          <div class="dot">14</div>
-          <div class="dot">15</div>
-        </div>
+        <span class="page-indicator" id="page-pro">1/2</span>
+      </div>
+
+      <div class="dots-row" id="row-pro">
+        <!-- Generasi Bulatan via JavaScript -->
       </div>
 
       <button class="btn-start pro">Mulai Hari Ke-1</button>
@@ -226,6 +214,71 @@
 
   </div>
 
-</body>
-          </html>
+  <script>
+    // System Paging & Rendering Bulatan Progress
+    const levelPages = {
+      pemula: 1,
+      menengah: 1,
+      pro: 1
+    };
 
+    // Hari yang sudah selesai (Contoh: Pemula selesai hari 1,2,3)
+    const completedDays = {
+      pemula: [1, 2, 3],
+      menengah: [],
+      pro: []
+    };
+
+    function renderDots(level) {
+      const rowContainer = document.getElementById(`row-${level}`);
+      const pageIndicator = document.getElementById(`page-${level}`);
+      const currentPage = levelPages[level];
+      
+      rowContainer.innerHTML = '';
+      
+      // Halaman 1 = Hari 1-15, Halaman 2 = Hari 16-30
+      const startDay = (currentPage - 1) * 15 + 1;
+      const endDay = startDay + 14;
+
+      // Render 15 Bulatan Angka
+      for (let i = startDay; i <= endDay; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.innerText = i;
+
+        if (completedDays[level].includes(i)) {
+          dot.classList.add('active', level);
+        }
+        rowContainer.appendChild(dot);
+      }
+
+      // Render Tombol Navigasi > atau <
+      const navBtn = document.createElement('button');
+      navBtn.className = 'dot-nav';
+      
+      if (currentPage === 1) {
+        navBtn.innerText = '>';
+        navBtn.onclick = () => {
+          levelPages[level] = 2;
+          renderDots(level);
+        };
+      } else {
+        navBtn.innerText = '<';
+        navBtn.onclick = () => {
+          levelPages[level] = 1;
+          renderDots(level);
+        };
+      }
+
+      rowContainer.appendChild(navBtn);
+      pageIndicator.innerText = `${currentPage}/2`;
+    }
+
+    // Inisialisasi Tampilan
+    renderDots('pemula');
+    renderDots('menengah');
+    renderDots('pro');
+  </script>
+
+</body>
+</html>
