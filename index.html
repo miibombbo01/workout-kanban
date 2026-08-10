@@ -370,7 +370,6 @@
       margin-bottom: 20px;
     }
 
-    /* Board Utama (Putih Atas) */
     .exercise-main-card {
       position: relative;
       z-index: 2;
@@ -397,7 +396,6 @@
       color: var(--text-desc);
     }
 
-    /* Board Lapisan Bawah (Warna Aksen) */
     .exercise-layer-card {
       display: none;
       position: relative;
@@ -415,7 +413,6 @@
       display: flex;
     }
 
-    /* Baris Set */
     .layer-set-row {
       display: flex;
       justify-content: space-between;
@@ -435,7 +432,6 @@
       gap: 12px;
     }
 
-    /* Pembatas Garis Tidak Menyentuh Ujung */
     .layer-divider {
       height: 1px;
       background-color: rgba(255, 255, 255, 0.35);
@@ -463,7 +459,6 @@
       opacity: 0.8;
     }
 
-    /* Lingkaran Checkbox */
     .layer-circle-checkbox {
       width: 24px;
       height: 24px;
@@ -584,7 +579,6 @@
   <script>
     const levelPages = { pemula: 1, menengah: 1, pro: 1 };
     
-    // Memuat data dari localStorage agar tersimpan secara permanen
     const savedData = localStorage.getItem('workout_exercise_state');
     const exerciseState = savedData ? JSON.parse(savedData) : {
       pemula: {},
@@ -788,6 +782,9 @@
         };
       }
 
+      // Opsi reps hingga 30
+      const repOptions = Array.from({length: 30}, (_, i) => i + 1);
+
       exercises.forEach((ex, exIndex) => {
         const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
         const completedSets = setsData.filter(r => r !== null).length;
@@ -823,9 +820,9 @@
               <div class="layer-set-actions">
                 <select class="reps-btn-select" ${isDone ? 'disabled' : ''} onchange="lockReps(${exIndex}, ${s}, this)">
                   <option value="">Reps</option>
-                  ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${currentReps == n ? 'selected' : ''}>${n}</option>`).join('')}
+                  ${repOptions.map(n => `<option value="${n}" ${currentReps == n ? 'selected' : ''}>${n}</option>`).join('')}
                 </select>
-                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(${exIndex}, ${s}, this)">
+                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(event, ${exIndex}, ${s}, this)">
                   ${isDone ? '✓' : ''}
                 </div>
               </div>
@@ -843,7 +840,7 @@
               <h4>${ex.name}</h4>
               <p>${ex.desc}</p>
             </div>
-            <div>${actionWidget}</div>
+            <div class="action-widget-wrapper">${actionWidget}</div>
           </div>
           <div class="exercise-layer-card">
             ${layerRowsHTML}
@@ -867,7 +864,8 @@
       localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
     }
 
-    function toggleSetCheck(exIndex, setIndex, checkElem) {
+    function toggleSetCheck(event, exIndex, setIndex, checkElem) {
+      event.stopPropagation(); // Mencegah pemicuan klik kartu utama
       const row = checkElem.closest('.layer-set-row');
       const select = row.querySelector('.reps-btn-select');
 
@@ -876,7 +874,9 @@
         return;
       }
 
-      if (checkElem.classList.contains('checked')) {
+      const isChecked = checkElem.classList.contains('checked');
+
+      if (isChecked) {
         checkElem.classList.remove('checked');
         checkElem.innerText = '';
         select.disabled = false;
@@ -890,8 +890,25 @@
 
       localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
 
-      const splitIndex = (selectedDayNumber - 1) % 3;
-      openWorkoutDay(selectedDayNumber, splitRotation[splitIndex].label);
+      // Update widget progres pada kartu utama secara langsung tanpa mereset kartu
+      const stack = checkElem.closest('.exercise-stack');
+      const widgetWrapper = stack.querySelector('.action-widget-wrapper');
+      const setsData = exerciseState[activeLevelKey][selectedDayNumber][exIndex];
+      const completedSets = setsData.filter(r => r !== null).length;
+
+      if (completedSets === 3) {
+        widgetWrapper.innerHTML = `<div class="check-circle" style="background:var(--accent-current); color:#FFF;">✓</div>`;
+      } else if (completedSets > 0) {
+        const percent = (completedSets / 3) * 100;
+        const deg = (percent / 100) * 360;
+        widgetWrapper.innerHTML = `
+          <div class="progress-circle" style="--progress-deg: ${deg}deg;">
+            <div class="progress-circle-inner">${completedSets}/3</div>
+          </div>
+        `;
+      } else {
+        widgetWrapper.innerHTML = `<button class="status-btn" style="padding: 6px 14px; width: auto;">Mulai</button>`;
+      }
     }
 
     function saveExerciseProgress() {
@@ -901,7 +918,7 @@
       showPage('page-2');
     }
 
-    // Inisialisasi awal saat halaman pertama kali dibuka
+    // Inisialisasi awal
     renderDots('pemula');
     renderDots('menengah');
     renderDots('pro');
