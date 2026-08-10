@@ -786,11 +786,11 @@
         { name: 'High to Low Ban-Push', desc: 'Kaitkan resistance band di atas & dorong kebawah', repOptions: [10, 15, 20, 25, 30] }
       ],
       'Core Day': [
-        { name: 'Plank Hold', desc: 'Tahan posisi tubuh lurus dan kencangkan perut', repOptions: [30s, 45s, 1m, 1,5m, 2m] },
-        { name: 'Crunch', desc: 'Angkat badan setengah sit up', repOptions: [15, 20, 23, 30, 40] },
-        { name: 'Knee Raises', desc: 'Tarik lutut ke arah dada', repOptions: [10, 15, 20, 25, 30] },
-        { name: 'Russian Twist', desc: 'Putar badan ke kiri dan kanan', repOptions: [10, 12, 16, 20, 24] }
-      ]
+  { name: 'Plank Hold', desc: 'Tahan posisi tubuh lurus dan kencangkan perut', repOptions: ['30s', '45s', '1m', '1.5m', '2m'] },
+  { name: 'Crunch', desc: 'Angkat badan setengah sit up', repOptions: [15, 20, 23, 30, 40] },
+  { name: 'Knee Raises', desc: 'Tarik lutut ke arah dada', repOptions: [10, 15, 20, 25, 30] },
+  { name: 'Russian Twist', desc: 'Putar badan ke kiri dan kanan', repOptions: [10, 12, 16, 20, 24] }
+]
     };
 
 
@@ -959,7 +959,7 @@ if (savedStartDate) {
           3: [null, null, null]
         };
       }
-
+    }
       // Opsi reps hingga 30
       const repOptions = Array.from({length: 30}, (_, i) => i + 1);
 
@@ -972,134 +972,134 @@ if (savedStartDate) {
 
         let actionWidget = '';
         if (completedSets === 3) {
-    // Variable pembantu modal reps
-    const optionColors = ['#F97316', '#EAB308', '#84CC16', '#10B981', '#06B6D4'];
-    let activeModalContext = null;
+    // Variable helper modal reps
+const optionColors = ['#F97316', '#EAB308', '#84CC16', '#10B981', '#06B6D4'];
+let activeModalContext = null;
 
-    function openWorkoutDay(dayNumber, splitName) {
-      selectedDayNumber = dayNumber;
-      document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
-      
-      const container = document.getElementById('exerciseListContainer');
-      container.innerHTML = '';
+function openWorkoutDay(dayNumber, splitName) {
+  selectedDayNumber = dayNumber;
+  document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
+  
+  const container = document.getElementById('exerciseListContainer');
+  container.innerHTML = '';
 
-      const exercises = workoutDatabase[splitName] || workoutDatabase['Pull Day'];
+  const exercises = workoutDatabase[splitName] || workoutDatabase['Pull Day'];
 
-      if (!exerciseState[activeLevelKey]) {
-        exerciseState[activeLevelKey] = {};
-      }
+  if (!exerciseState[activeLevelKey]) {
+    exerciseState[activeLevelKey] = {};
+  }
 
-      if (!exerciseState[activeLevelKey][dayNumber]) {
-        exerciseState[activeLevelKey][dayNumber] = {
-          0: [null, null, null],
-          1: [null, null, null],
-          2: [null, null, null],
-          3: [null, null, null]
-        };
-      }
+  if (!exerciseState[activeLevelKey][dayNumber]) {
+    exerciseState[activeLevelKey][dayNumber] = {
+      0: [null, null, null],
+      1: [null, null, null],
+      2: [null, null, null],
+      3: [null, null, null]
+    };
+  }
 
-      exercises.forEach((ex, exIndex) => {
-        const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
-        const completedSets = setsData.filter(r => r !== null).length;
+  exercises.forEach((ex, exIndex) => {
+    const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
+    const completedSets = setsData.filter(r => r !== null).length;
 
-        const stack = document.createElement('div');
-        stack.className = 'exercise-stack';
+    const stack = document.createElement('div');
+    stack.className = 'exercise-stack';
 
-        let actionWidget = '';
-        if (completedSets === 3) {
-          actionWidget = `<div class="check-circle" style="background:var(--accent-current); color:#FFF;">✓</div>`;
-        } else if (completedSets > 0) {
-          const percent = (completedSets / 3) * 100;
-          const deg = (percent / 100) * 360;
-          actionWidget = `
-            <div class="progress-circle" style="--progress-deg: ${deg}deg;">
-              <div class="progress-circle-inner">${completedSets}/3</div>
-            </div>
-          `;
-        } else {
-          actionWidget = `<button class="status-btn" style="padding: 6px 14px; width: auto;">Mulai</button>`;
-        }
-
-        const setLabels = ['Set pertama', 'Set kedua', 'Set ketiga'];
-        let layerRowsHTML = '';
-
-        for (let s = 0; s < 3; s++) {
-          const currentReps = setsData[s];
-          const isDone = currentReps !== null;
-
-          layerRowsHTML += `
-            <div class="layer-set-row">
-              <span class="layer-set-label">${setLabels[s]}</span>
-              <div class="layer-set-actions">
-                <button class="reps-trigger-btn ${isDone ? 'disabled' : ''}" 
-                        onclick="openRepsModal(event, ${exIndex}, ${s}, '${splitName}')" id="repBtn_${exIndex}_${s}">
-                  ${isDone ? currentReps + ' Reps' : 'Pilih Reps'}
-                </button>
-                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(event, ${exIndex}, ${s}, '${splitName}', this)">
-                  ${isDone ? '✓' : ''}
-                </div>
-              </div>
-            </div>
-          `;
-
-          if (s < 2) {
-            layerRowsHTML += `<div class="layer-divider"></div>`;
-          }
-        }
-
-        stack.innerHTML = `
-          <div class="exercise-main-card" onclick="toggleExpandStack(this)">
-            <div class="exercise-info">
-              <h4>${ex.name}</h4>
-              <p>${ex.desc}</p>
-            </div>
-            <div class="action-widget-wrapper">${actionWidget}</div>
-          </div>
-          <div class="exercise-layer-card">
-            ${layerRowsHTML}
-          </div>
-        `;
-
-        container.appendChild(stack);
-      });
-
-      showPage('page-3');
+    let actionWidget = '';
+    if (completedSets === 3) {
+      actionWidget = `<div class="check-circle" style="background:var(--accent-current); color:#FFF;">✓</div>`;
+    } else if (completedSets > 0) {
+      const percent = (completedSets / 3) * 100;
+      const deg = (percent / 100) * 360;
+      actionWidget = `
+        <div class="progress-circle" style="--progress-deg: ${deg}deg;">
+          <div class="progress-circle-inner">${completedSets}/3</div>
+        </div>
+      `;
+    } else {
+      actionWidget = `<button class="status-btn" style="padding: 6px 14px; width: auto;">Mulai</button>`;
     }
 
-              function openRepsModal(event, exIndex, setIndex, splitName) {
-      event.stopPropagation();
-      const currentReps = exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex];
-      if (currentReps !== null) return; 
+    const setLabels = ['Set pertama', 'Set kedua', 'Set ketiga'];
+    let layerRowsHTML = '';
 
-      const exercise = (workoutDatabase[splitName] || workoutDatabase['Pull Day'])[exIndex];
-      const repOptions = exercise.repOptions || [1, 2, 3, 4, 5];
+    for (let s = 0; s < 3; s++) {
+      const currentReps = setsData[s];
+      const isDone = currentReps !== null;
 
-      activeModalContext = { exIndex, setIndex, splitName, selectedVal: null, repOptions };
+      layerRowsHTML += `
+        <div class="layer-set-row">
+          <span class="layer-set-label">${setLabels[s]}</span>
+          <div class="layer-set-actions">
+            <button class="reps-trigger-btn ${isDone ? 'disabled' : ''}" 
+                    onclick="openRepsModal(event, ${exIndex}, ${s}, '${splitName}')" id="repBtn_${exIndex}_${s}">
+              ${isDone ? currentReps + ' Reps' : 'Pilih Reps'}
+            </button>
+            <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(event, ${exIndex}, ${s}, '${splitName}', this)">
+              ${isDone ? '✓' : ''}
+            </div>
+          </div>
+        </div>
+      `;
 
-      const emojiElem = document.getElementById('modalEmoji');
-      const textElem = document.getElementById('modalText');
-      const optionsContainer = document.getElementById('modalOptions');
-      const okBtn = document.getElementById('modalBtnOk');
-
-      emojiElem.innerText = '🤔';
-      emojiElem.style.transform = 'scale(1)';
-      textElem.innerText = 'Kuat berapa nih?';
-      textElem.style.color = '#1E293B';
-      okBtn.classList.remove('active');
-      optionsContainer.innerHTML = '';
-
-      repOptions.forEach((num, idx) => {
-        const color = optionColors[idx % optionColors.length];
-        const chip = document.createElement('div');
-        chip.className = 'rep-chip';
-        chip.style.setProperty('--chip-color', color);
-        chip.innerText = num;
-        chip.onclick = () => selectRepOption(num, idx, color);
-        optionsContainer.appendChild(chip);
-      });
-
-      document.getElementById('repsModal').classList.add('active');
+      if (s < 2) {
+        layerRowsHTML += `<div class="layer-divider"></div>`;
+      }
     }
+
+    stack.innerHTML = `
+      <div class="exercise-main-card" onclick="toggleExpandStack(this)">
+        <div class="exercise-info">
+          <h4>${ex.name}</h4>
+          <p>${ex.desc}</p>
+        </div>
+        <div class="action-widget-wrapper">${actionWidget}</div>
+      </div>
+      <div class="exercise-layer-card">
+        ${layerRowsHTML}
+      </div>
+    `;
+
+    container.appendChild(stack);
+  });
+
+  showPage('page-3');
+}
+
+function openRepsModal(event, exIndex, setIndex, splitName) {
+  event.stopPropagation();
+  const currentReps = exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex];
+  if (currentReps !== null) return; 
+
+  const exercise = (workoutDatabase[splitName] || workoutDatabase['Pull Day'])[exIndex];
+  const repOptions = exercise.repOptions || [1, 2, 3, 4, 5];
+
+  activeModalContext = { exIndex, setIndex, splitName, selectedVal: null, repOptions };
+
+  const emojiElem = document.getElementById('modalEmoji');
+  const textElem = document.getElementById('modalText');
+  const optionsContainer = document.getElementById('modalOptions');
+  const okBtn = document.getElementById('modalBtnOk');
+
+  emojiElem.innerText = '🤔';
+  emojiElem.style.transform = 'scale(1)';
+  textElem.innerText = 'Kuat berapa nih?';
+  textElem.style.color = '#1E293B';
+  okBtn.classList.remove('active');
+  optionsContainer.innerHTML = '';
+
+  repOptions.forEach((num, idx) => {
+    const color = optionColors[idx % optionColors.length];
+    const chip = document.createElement('div');
+    chip.className = 'rep-chip';
+    chip.style.setProperty('--chip-color', color);
+    chip.innerText = num;
+    chip.onclick = () => selectRepOption(num, idx, color);
+    optionsContainer.appendChild(chip);
+  });
+
+  document.getElementById('repsModal').classList.add('active');
+}
 
     function selectRepOption(value, index, color) {
       activeModalContext.selectedVal = value;
@@ -1227,6 +1227,5 @@ if (savedStartDate) {
     <button class="modal-btn-ok" id="modalBtnOk" onclick="confirmRepsSelection()">OK</button>
   </div>
 </div>
-  
 </body>
 </html>
