@@ -496,6 +496,22 @@
       cursor: pointer;
       margin-top: 16px;
     }
+
+    /* Ukuran dan batas default (background putih) */
+.custom-workout-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #10B981; /* Stroke hijau saat belum selesai */
+  box-sizing: border-box;
+}
+
+/* Batas putih saat papan dalam kondisi selesai (hijau) */
+.day-mini-board.completed .custom-workout-icon {
+  border: 1.5px solid #FFFFFF !important; /* Stroke putih saat selesai */
+}
+    
   </style>
   <link rel="manifest" href="manifest.json">
 </head>
@@ -767,9 +783,9 @@ if (savedStartDate) {
           htmlContent += `<button class="status-btn">Mulai</button>`;
         }
 
-          htmlContent += `
+           htmlContent += `
           <div class="focus-box">
-            <span class="material-symbols-outlined" style="font-size:20px;">${currentSplit.iconName}</span>
+            <img src="${currentSplit.iconSrc}" class="custom-workout-icon" alt="${currentSplit.label}">
             <span class="focus-label">${currentSplit.label}</span>
           </div>
           <div class="workout-count">4 Latihan</div>
