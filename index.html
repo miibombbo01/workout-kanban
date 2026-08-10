@@ -938,40 +938,6 @@ if (savedStartDate) {
       }
     }
 
-    function openWorkoutDay(dayNumber, splitName) {
-      selectedDayNumber = dayNumber;
-      document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
-      
-      const container = document.getElementById('exerciseListContainer');
-      container.innerHTML = '';
-
-      const exercises = workoutDatabase[splitName] || workoutDatabase['Pull Day'];
-
-      if (!exerciseState[activeLevelKey]) {
-        exerciseState[activeLevelKey] = {};
-      }
-
-      if (!exerciseState[activeLevelKey][dayNumber]) {
-        exerciseState[activeLevelKey][dayNumber] = {
-          0: [null, null, null],
-          1: [null, null, null],
-          2: [null, null, null],
-          3: [null, null, null]
-        };
-      }
-    }
-      // Opsi reps hingga 30
-      const repOptions = Array.from({length: 30}, (_, i) => i + 1);
-
-      exercises.forEach((ex, exIndex) => {
-        const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
-        const completedSets = setsData.filter(r => r !== null).length;
-
-        const stack = document.createElement('div');
-        stack.className = 'exercise-stack';
-
-        let actionWidget = '';
-        if (completedSets === 3) {
     // Variable helper modal reps
 const optionColors = ['#F97316', '#EAB308', '#84CC16', '#10B981', '#06B6D4'];
 let activeModalContext = null;
