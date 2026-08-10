@@ -14,42 +14,48 @@
       --dot-empty: #E2E8F0;
       --text-dot-empty: #94A3B8;
 
-      --accent-pemula: #2DD4BF;   /* Cyan */
-      --accent-menengah: #FB923C; /* Oranye */
-      --accent-pro: #C084FC;      /* Ungu */
+      --accent-pemula: #2DD4BF;
+      --accent-menengah: #FB923C;
+      --accent-pro: #C084FC;
+      --accent-current: #2DD4BF;
     }
 
     body {
       background-color: var(--bg-main);
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px 12px;
+      padding: 0;
     }
 
-    /* Container Kanban Board */
+    .page {
+      display: none;
+      padding: 20px 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* --- LAYAR 1: KANBAN UTAMA --- */
     .kanban-board {
       display: flex;
+      flex-direction: column;
       gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      max-width: 1100px;
-      margin: 0 auto;
     }
 
     .kanban-card {
       background-color: var(--card-bg);
       border-radius: 16px;
       padding: 18px;
-      width: 100%;
-      max-width: 320px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       display: flex;
       flex-direction: column;
       gap: 12px;
-      box-sizing: border-box;
     }
 
-    /* Tag Judul Level */
     .card-tag {
       align-self: flex-start;
       padding: 6px 14px;
@@ -62,7 +68,6 @@
     .card-tag.menengah { background-color: var(--accent-menengah); }
     .card-tag.pro { background-color: var(--accent-pro); }
 
-    /* Deskripsi 1 Kalimat To The Point */
     .card-desc {
       color: var(--text-desc);
       font-size: 13px;
@@ -70,12 +75,10 @@
       margin: 0;
     }
 
-    /* Progress Header (Label & Teks 1/2) */
     .progress-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 4px;
     }
 
     .progress-label {
@@ -90,19 +93,12 @@
       font-weight: bold;
     }
 
-    /* Progress Bar 1 Baris Horizontal */
     .dots-row {
       display: flex;
       gap: 6px;
       align-items: center;
-      overflow-x: auto; /* Bisa di-scroll halus jika layar sangat sempit */
+      overflow-x: auto;
       padding-bottom: 4px;
-      scroll-behavior: smooth;
-    }
-
-    /* Sembunyikan scrollbar bawaan browser */
-    .dots-row::-webkit-scrollbar {
-      display: none;
     }
 
     .dot {
@@ -123,7 +119,6 @@
     .dot.active.menengah { background-color: var(--accent-menengah); color: #FFF; }
     .dot.active.pro { background-color: var(--accent-pro); color: #FFF; }
 
-    /* Tombol Navigasi Next '>' */
     .dot-nav {
       min-width: 28px;
       height: 28px;
@@ -140,7 +135,6 @@
       border: none;
     }
 
-    /* Tombol Mulai */
     .btn-start {
       width: 100%;
       padding: 12px 0;
@@ -150,84 +144,403 @@
       font-size: 14px;
       color: #FFFFFF;
       cursor: pointer;
-      margin-top: 6px;
     }
     .btn-start.pemula { background-color: var(--accent-pemula); }
     .btn-start.menengah { background-color: var(--accent-menengah); }
     .btn-start.pro { background-color: var(--accent-pro); }
+
+    /* --- TOP BAR --- */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .btn-back {
+      background: #FFFFFF;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .nav-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text-title);
+      margin: 0;
+    }
+
+    /* --- DATE PICKER BAR --- */
+    .date-picker-card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .date-picker-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-title);
+    }
+
+    .date-input {
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text-title);
+      outline: none;
+    }
+
+    /* --- LAYAR 2: PROGRAM PER MINGGU --- */
+    .week-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .week-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text-title);
+    }
+
+    .week-duration {
+      font-size: 11px;
+      color: var(--text-desc);
+      font-weight: bold;
+    }
+
+    .days-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    /* MINI BOARD KARTU HARIAN */
+    .day-mini-board {
+      min-width: 80px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    /* KARTU SELESAI PENUH */
+    .day-mini-board.completed {
+      background-color: var(--accent-current);
+      border-color: var(--accent-current);
+      color: #FFFFFF;
+    }
+
+    /* 1. Angka Hari */
+    .day-num {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text-title);
+    }
+
+    .day-mini-board.completed .day-num {
+      color: #FFFFFF;
+    }
+
+    .day-date-sub {
+      font-size: 9px;
+      color: var(--text-desc);
+      margin-top: -4px;
+    }
+
+    .day-mini-board.completed .day-date-sub {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* 2. Tombol Status / Progress Bar */
+    .status-btn {
+      width: 100%;
+      background-color: var(--accent-current);
+      color: #FFFFFF;
+      border: none;
+      padding: 5px 0;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Circular Progress Container */
+    .progress-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent-current) var(--progress-deg, 0deg), #E2E8F0 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0;
+    }
+
+    .progress-circle-inner {
+      width: 20px;
+      height: 20px;
+      background: #F8FAFC;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: var(--text-title);
+    }
+
+    /* Circle Centang Selesai */
+    .check-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #FFFFFF;
+      color: var(--accent-current);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* 3. Ikon Focus Area & Teks */
+    .focus-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .focus-icon {
+      font-size: 16px;
+    }
+
+    .focus-label {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--text-title);
+    }
+
+    .day-mini-board.completed .focus-label {
+      color: #FFFFFF;
+    }
+
+    /* 4. Total Gerakan */
+    .workout-count {
+      font-size: 9px;
+      color: var(--text-desc);
+    }
+
+    .day-mini-board.completed .workout-count {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* --- LAYAR 3: LIST GERAKAN --- */
+    .exercise-card {
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .exercise-info h4 {
+      margin: 0 0 4px 0;
+      font-size: 14px;
+      color: var(--text-title);
+    }
+
+    .exercise-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-desc);
+    }
+
+    .btn-check-exercise {
+      background: #E2E8F0;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-desc);
+      cursor: pointer;
+    }
+
+    .btn-check-exercise.done {
+      background: var(--accent-current);
+      color: #FFFFFF;
+    }
+
+    .btn-save-progress {
+      width: 100%;
+      padding: 14px;
+      background: #1E293B;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="kanban-board">
-
-    <!-- 1. KARTU PEMULA -->
-    <div class="kanban-card">
-      <div class="card-tag pemula">PEMULA</div>
-      <p class="card-desc">Membangun kekuatan dasar dan stabilitas gerakan push-pull.</p>
-
-      <div class="progress-header">
-        <span class="progress-label">Progres Level</span>
-        <span class="page-indicator" id="page-pemula">1/2</span>
+  <!-- LAYAR 1: KANBAN UTAMA -->
+  <div class="page active" id="page-1">
+    <div class="kanban-board">
+      <div class="kanban-card">
+        <div class="card-tag pemula">PEMULA</div>
+        <p class="card-desc">Membangun kekuatan dasar dan stabilitas gerakan push-pull.</p>
+        <div class="progress-header">
+          <span class="progress-label">Progres Level</span>
+          <span class="page-indicator" id="page-pemula">1/2</span>
+        </div>
+        <div class="dots-row" id="row-pemula"></div>
+        <button class="btn-start pemula" onclick="openProgram('pemula', 'Pemula')">Mulai Hari Ke-1</button>
       </div>
 
-      <div class="dots-row" id="row-pemula">
-        <!-- Generasi Bulatan 1-15 via JavaScript -->
+      <div class="kanban-card">
+        <div class="card-tag menengah">MENENGAH</div>
+        <p class="card-desc">Meningkatkan massa otot (hypertrophy) dengan beban tubuh lebih berat.</p>
+        <div class="progress-header">
+          <span class="progress-label">Progres Level</span>
+          <span class="page-indicator" id="page-menengah">1/2</span>
+        </div>
+        <div class="dots-row" id="row-menengah"></div>
+        <button class="btn-start menengah" onclick="openProgram('menengah', 'Menengah')">Mulai Hari Ke-1</button>
       </div>
 
-      <button class="btn-start pemula">Mulai Hari Ke-4</button>
+      <div class="kanban-card">
+        <div class="card-tag pro">PRO</div>
+        <p class="card-desc">Mematangkan volume dan ketahanan otot untuk tingkat lanjut.</p>
+        <div class="progress-header">
+          <span class="progress-label">Progres Level</span>
+          <span class="page-indicator" id="page-pro">1/2</span>
+        </div>
+        <div class="dots-row" id="row-pro"></div>
+        <button class="btn-start pro" onclick="openProgram('pro', 'Pro')">Mulai Hari Ke-1</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYAR 2: PROGRAM DENGAN SINKRONISASI TANGGAL & ROTASI SPLIT -->
+  <div class="page" id="page-2">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showPage('page-1')">←</button>
+      <h2 class="nav-title" id="programTitle">Program Pemula</h2>
     </div>
 
-    <!-- 2. KARTU MENENGAH -->
-    <div class="kanban-card">
-      <div class="card-tag menengah">MENENGAH</div>
-      <p class="card-desc">Meningkatkan massa otot (hypertrophy) dengan beban tubuh lebih berat.</p>
-
-      <div class="progress-header">
-        <span class="progress-label">Progres Level</span>
-        <span class="page-indicator" id="page-menengah">1/2</span>
-      </div>
-
-      <div class="dots-row" id="row-menengah">
-        <!-- Generasi Bulatan via JavaScript -->
-      </div>
-
-      <button class="btn-start menengah">Mulai Hari Ke-1</button>
+    <!-- Date Picker untuk Tanggal Mulai -->
+    <div class="date-picker-card">
+      <span class="date-picker-label">Mulai Tanggal:</span>
+      <input type="date" id="startDatePicker" class="date-input" onchange="updateProgramDates()">
     </div>
 
-    <!-- 3. KARTU PRO -->
-    <div class="kanban-card">
-      <div class="card-tag pro">PRO</div>
-      <p class="card-desc">Mematangkan volume dan ketahanan otot untuk tingkat lanjut.</p>
-
-      <div class="progress-header">
-        <span class="progress-label">Progres Level</span>
-        <span class="page-indicator" id="page-pro">1/2</span>
+    <!-- Minggu 1 -->
+    <div class="week-card">
+      <div class="week-header">
+        <span class="week-title">MINGGU 1</span>
+        <span class="week-duration">7-17 MENIT / HARI</span>
       </div>
-
-      <div class="dots-row" id="row-pro">
-        <!-- Generasi Bulatan via JavaScript -->
-      </div>
-
-      <button class="btn-start pro">Mulai Hari Ke-1</button>
+      <div class="days-grid" id="week-1-grid"></div>
     </div>
 
+    <!-- Minggu 2 -->
+    <div class="week-card">
+      <div class="week-header">
+        <span class="week-title">MINGGU 2</span>
+        <span class="week-duration">11-21 MENIT / HARI</span>
+      </div>
+      <div class="days-grid" id="week-2-grid"></div>
+    </div>
+  </div>
+
+  <!-- LAYAR 3: LIST GERAKAN WORKOUT -->
+  <div class="page" id="page-3">
+    <div class="top-bar">
+      <button class="btn-back" onclick="showPage('page-2')">←</button>
+      <h2 class="nav-title" id="workoutDayTitle">Hari Ke-1</h2>
+    </div>
+
+    <div id="exerciseListContainer"></div>
+
+    <button class="btn-save-progress" onclick="saveExerciseProgress()">Simpan & Kembali</button>
   </div>
 
   <script>
-    // System Paging & Rendering Bulatan Progress
-    const levelPages = {
-      pemula: 1,
-      menengah: 1,
-      pro: 1
+    const levelPages = { pemula: 1, menengah: 1, pro: 1 };
+    
+    // Tracking Progres Latihan tiap hari: { dayNum: totalDoneExercises }
+    const dayProgressData = {
+      pemula: {},
+      menengah: {},
+      pro: {}
     };
 
-    // Hari yang sudah selesai (Contoh: Pemula selesai hari 1,2,3)
-    const completedDays = {
-      pemula: [1, 2, 3],
-      menengah: [],
-      pro: []
+    const TOTAL_EXERCISES_PER_DAY = 4;
+    let activeLevelKey = 'pemula';
+    let selectedDayNumber = 1;
+
+    const themeColors = {
+      pemula: '#2DD4BF',
+      menengah: '#FB923C',
+      pro: '#C084FC'
     };
+
+    // Pola Rotasi: Pull Day -> Push Day -> Core Day
+    const splitRotation = [
+      { label: 'Pull Day', icon: '🦬' },
+      { label: 'Push Day', icon: '🏋️' },
+      { label: 'Core Day', icon: '🧘' }
+    ];
+
+    // Default Date Today
+    document.getElementById('startDatePicker').valueAsDate = new Date();
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
 
     function renderDots(level) {
       const rowContainer = document.getElementById(`row-${level}`);
@@ -235,46 +548,158 @@
       const currentPage = levelPages[level];
       
       rowContainer.innerHTML = '';
-      
-      // Halaman 1 = Hari 1-15, Halaman 2 = Hari 16-30
       const startDay = (currentPage - 1) * 15 + 1;
       const endDay = startDay + 14;
 
-      // Render 15 Bulatan Angka
       for (let i = startDay; i <= endDay; i++) {
         const dot = document.createElement('div');
         dot.className = 'dot';
         dot.innerText = i;
-
-        if (completedDays[level].includes(i)) {
+        if (dayProgressData[level][i] === TOTAL_EXERCISES_PER_DAY) {
           dot.classList.add('active', level);
         }
         rowContainer.appendChild(dot);
       }
 
-      // Render Tombol Navigasi > atau <
       const navBtn = document.createElement('button');
       navBtn.className = 'dot-nav';
-      
-      if (currentPage === 1) {
-        navBtn.innerText = '>';
-        navBtn.onclick = () => {
-          levelPages[level] = 2;
-          renderDots(level);
-        };
-      } else {
-        navBtn.innerText = '<';
-        navBtn.onclick = () => {
-          levelPages[level] = 1;
-          renderDots(level);
-        };
-      }
+      navBtn.innerText = currentPage === 1 ? '>' : '<';
+      navBtn.onclick = () => {
+        levelPages[level] = currentPage === 1 ? 2 : 1;
+        renderDots(level);
+      };
 
       rowContainer.appendChild(navBtn);
       pageIndicator.innerText = `${currentPage}/2`;
     }
 
-    // Inisialisasi Tampilan
+    function openProgram(levelKey, levelLabel) {
+      activeLevelKey = levelKey;
+      document.documentElement.style.setProperty('--accent-current', themeColors[levelKey]);
+      document.getElementById('programTitle').innerText = `Program ${levelLabel}`;
+      
+      updateProgramDates();
+      showPage('page-2');
+    }
+
+    function updateProgramDates() {
+      renderWeekGrid('week-1-grid', 1, 7);
+      renderWeekGrid('week-2-grid', 8, 14);
+    }
+
+    function renderWeekGrid(containerId, startDay, endDay) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      
+      const startDateVal = document.getElementById('startDatePicker').value;
+      const baseDate = startDateVal ? new Date(startDateVal) : new Date();
+
+      for (let day = startDay; day <= endDay; day++) {
+        // Hitung Tanggal Dinamis
+        const currentDate = new Date(baseDate);
+        currentDate.setDate(baseDate.getDate() + (day - 1));
+        const dateFormatted = currentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+        // Pola Split Rotasi
+        const splitIndex = (day - 1) % 3;
+        const currentSplit = splitRotation[splitIndex];
+
+        // Status Pengerjaan
+        const doneCount = dayProgressData[activeLevelKey][day] || 0;
+        const isCompleted = doneCount === TOTAL_EXERCISES_PER_DAY;
+        const isInProgress = doneCount > 0 && doneCount < TOTAL_EXERCISES_PER_DAY;
+
+        const board = document.createElement('div');
+        board.className = `day-mini-board ${isCompleted ? 'completed' : ''}`;
+        board.onclick = () => openWorkoutDay(day);
+
+        // 1. Nomor Hari & Tanggal Subtext
+        let htmlContent = `
+          <div class="day-num">${day}</div>
+          <div class="day-date-sub">${dateFormatted}</div>
+        `;
+
+        // 2. Tombol Status / Progress Circle / Centang
+        if (isCompleted) {
+          htmlContent += `<div class="check-circle">✓</div>`;
+        } else if (isInProgress) {
+          const percent = (doneCount / TOTAL_EXERCISES_PER_DAY) * 100;
+          const deg = (percent / 100) * 360;
+          htmlContent += `
+            <div class="progress-circle" style="--progress-deg: ${deg}deg;">
+              <div class="progress-circle-inner">${doneCount}/${TOTAL_EXERCISES_PER_DAY}</div>
+            </div>
+          `;
+        } else {
+          htmlContent += `<button class="status-btn">Mulai</button>`;
+        }
+
+        // 3. Focus Area Icon & Subtext
+        htmlContent += `
+          <div class="focus-box">
+            <span class="focus-icon">${currentSplit.icon}</span>
+            <span class="focus-label">${currentSplit.label}</span>
+          </div>
+        `;
+
+        // 4. Keterangan Jumlah Gerakan
+        htmlContent += `<div class="workout-count">${TOTAL_EXERCISES_PER_DAY} Latihan</div>`;
+
+        board.innerHTML = htmlContent;
+        container.appendChild(board);
+      }
+    }
+
+    function openWorkoutDay(dayNumber) {
+      selectedDayNumber = dayNumber;
+      document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
+      
+      const container = document.getElementById('exerciseListContainer');
+      container.innerHTML = '';
+
+      const doneCount = dayProgressData[activeLevelKey][dayNumber] || 0;
+
+      const exercises = [
+        "Movement 1 (Push/Pull/Core)",
+        "Movement 2 (Push/Pull/Core)",
+        "Movement 3 (Push/Pull/Core)",
+        "Movement 4 (Push/Pull/Core)"
+      ];
+
+      exercises.forEach((exName, index) => {
+        const isChecked = index < doneCount;
+        const card = document.createElement('div');
+        card.className = 'exercise-card';
+        card.innerHTML = `
+          <div class="exercise-info">
+            <h4>${exName}</h4>
+            <p>3 Set x 10 Reps</p>
+          </div>
+          <button class="btn-check-exercise ${isChecked ? 'done' : ''}" onclick="toggleExercise(this)">
+            ${isChecked ? '✓ Selesai' : 'Selesai'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+
+      showPage('page-3');
+    }
+
+    function toggleExercise(btn) {
+      btn.classList.toggle('done');
+      btn.innerText = btn.classList.contains('done') ? '✓ Selesai' : 'Selesai';
+    }
+
+    function saveExerciseProgress() {
+      const doneButtons = document.querySelectorAll('.btn-check-exercise.done');
+      dayProgressData[activeLevelKey][selectedDayNumber] = doneButtons.length;
+
+      renderDots(activeLevelKey);
+      updateProgramDates();
+      showPage('page-2');
+    }
+
+    // Inisialisasi
     renderDots('pemula');
     renderDots('menengah');
     renderDots('pro');
