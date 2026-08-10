@@ -637,7 +637,15 @@
       ]
     };
 
-    document.getElementById('startDatePicker').valueAsDate = new Date();
+    // Cek apakah ada tanggal tersimpan di localStorage
+const savedStartDate = localStorage.getItem('workout_start_date');
+if (savedStartDate) {
+  document.getElementById('startDatePicker').value = savedStartDate;
+} else {
+  // Jika belum ada, default hari ini (YYYY-MM-DD)
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('startDatePicker').value = todayStr;
+}
 
     function showPage(pageId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -698,9 +706,15 @@
     }
 
     function updateProgramDates() {
-      renderWeekGrid('week-1-grid', 1, 7);
-      renderWeekGrid('week-2-grid', 8, 14);
-    }
+  const startDateVal = document.getElementById('startDatePicker').value;
+  if (startDateVal) {
+    // Simpan tanggal pilihan ke localStorage agar tidak hilang saat refresh
+    localStorage.setItem('workout_start_date', startDateVal);
+  }
+  renderWeekGrid('week-1-grid', 1, 7);
+  renderWeekGrid('week-2-grid', 8, 14);
+}
+
 
     function renderWeekGrid(containerId, startDay, endDay) {
       const container = document.getElementById(containerId);
