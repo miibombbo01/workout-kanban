@@ -261,9 +261,13 @@
     .day-mini-board.completed {
       background-color: var(--accent-current);
       border-color: var(--accent-current);
-      color: #FFFFFF;
+      color: #FFFFFF;    
     }
 
+    .day-mini-board.completed .material-symbols-outlined {
+  color: #FFFFFF !important;
+    }
+    
     .day-num {
       font-size: 16px;
       font-weight: bold;
@@ -750,7 +754,7 @@
 
           htmlContent += `
           <div class="focus-box">
-            <span class="material-symbols-outlined" style="font-size:20px; color:#64748B;">${currentSplit.iconName}</span>
+            <span class="material-symbols-outlined" style="font-size:20px;">${currentSplit.iconName}</span>
             <span class="focus-label">${currentSplit.label}</span>
           </div>
           <div class="workout-count">4 Latihan</div>
