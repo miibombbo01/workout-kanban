@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Work Out Level Up</title>
@@ -594,19 +595,19 @@
       menengah: '#FB923C',
       pro: '#C084FC'
     };
-
+    
     const splitRotation = [
       { 
         label: 'Pull Day', 
-        iconImg: 'https://img.icons8.com/ios-filled/50/64748B/back-bodybuilder.png'
+        iconName: 'fitness_center'
       },
       { 
         label: 'Chest Day', 
-        iconImg: 'https://img.icons8.com/ios-filled/50/64748B/torso.png'
+        iconName: 'accessibility_new'
       },
       { 
         label: 'Core Day', 
-        iconImg: 'https://img.icons8.com/ios-filled/50/64748B/six-pack.png'
+        iconName: 'self_improvement'
       }
     ];
 
@@ -747,13 +748,14 @@
           htmlContent += `<button class="status-btn">Mulai</button>`;
         }
 
-        htmlContent += `
+          htmlContent += `
           <div class="focus-box">
-            <img src="${currentSplit.iconImg}" class="focus-icon-img" alt="${currentSplit.label}">
+            <span class="material-symbols-outlined" style="font-size:20px; color:#64748B;">${currentSplit.iconName}</span>
             <span class="focus-label">${currentSplit.label}</span>
           </div>
           <div class="workout-count">4 Latihan</div>
         `;
+
 
         board.innerHTML = htmlContent;
         container.appendChild(board);
