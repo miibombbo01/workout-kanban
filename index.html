@@ -511,7 +511,147 @@
 .day-mini-board.completed .custom-workout-icon {
   border: 1.5px solid #FFFFFF !important; /* Stroke putih saat selesai */
 }
-    
+
+    /* --- POP-UP MODAL REPS --- */
+.reps-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.reps-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reps-modal-card {
+  background: #FFFFFF;
+  width: 85%;
+  max-width: 320px;
+  border-radius: 28px;
+  padding: 32px 20px 20px 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  transform: scale(0.5);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.reps-modal-overlay.active .reps-modal-card {
+  transform: scale(1);
+}
+
+.modal-emoji-wrapper {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 76px;
+  height: 76px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.modal-emoji {
+  font-size: 44px;
+  line-height: 1;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1E293B;
+  margin-top: 24px;
+  margin-bottom: 20px;
+  min-height: 24px;
+  transition: color 0.2s ease;
+}
+
+.modal-options-grid {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.rep-chip {
+  flex: 1;
+  min-width: 44px;
+  height: 48px;
+  border-radius: 12px;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #475569;
+  font-weight: bold;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rep-chip.selected {
+  border-color: var(--chip-color, #10B981);
+  color: var(--chip-color, #10B981);
+  background: rgba(16, 185, 129, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.modal-btn-ok {
+  width: 100%;
+  padding: 12px;
+  background: #1E293B;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0.5;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-ok.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Tombol trigger reps di dalam list latihan */
+.reps-trigger-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.reps-trigger-btn.disabled {
+  opacity: 0.8;
+  cursor: default;
+      }
   </style>
   <link rel="manifest" href="manifest.json">
 </head>
@@ -632,26 +772,27 @@
       }
     ];
 
-    const workoutDatabase = {
+        const workoutDatabase = {
       'Pull Day': [
-        { name: 'Negative Pull-up', desc: 'Turun selama 5 detik perlahan' },
-        { name: 'Australian Pull-up', desc: 'Tarik dada ke bar horizontal' },
-        { name: 'Scapula Shrug', desc: 'Memasukkan bahu ke kantong celana' },
-        { name: 'High to Low Row', desc: 'Jaga tubuh lurus, tarik siku' }
+        { name: 'Negative Pull-up', desc: 'Turun selama 5 detik perlahan', repOptions: [1, 2, 3, 4, 5] },
+        { name: 'Australian Pull-up', desc: 'Tarik dada ke bar horizontal', repOptions: [5, 8, 10, 12, 15] },
+        { name: 'Scapula Shrug', desc: 'Memasukkan bahu ke kantong celana', repOptions: [8, 10, 12, 15, 20] },
+        { name: 'High to Low Ban-Row', desc: 'Jaga tubuh lurus, tarik siku', repOptions: [10, 15, 20, 25, 30] }
       ],
       'Chest Day': [
-        { name: 'Push-up', desc: 'Turun sampai dada hampir menyentuh lantai' },
-        { name: 'Incline Push-up', desc: 'Tangan di posisi lebih tinggi' },
-        { name: 'Knee Push-up', desc: 'Tumpuan pada lutut untuk pemula' },
-        { name: 'Plank to Push-up', desc: 'Transisi dari siku ke telapak tangan' }
+        { name: 'Push-up', desc: 'Turun sampai dada hampir menyentuh lantai', repOptions: [5, 8, 10, 12, 15] },
+        { name: 'Incline Push-up', desc: 'Tangan di posisi lebih tinggi', repOptions: [6, 8, 10, 12, 15] },
+        { name: 'Pike Push-up', desc: 'Tumpuan pada lutut untuk pemula', repOptions: [5, 8, 10, 12, 15] },
+        { name: 'High to Low Ban-Push', desc: 'Kaitkan resistance band di atas & dorong kebawah', repOptions: [10, 15, 20, 25, 30] }
       ],
       'Core Day': [
-        { name: 'Plank Hold', desc: 'Tahan posisi tubuh lurus dan kencangkan perut' },
-        { name: 'Lying Leg Raise', desc: 'Angkat kaki perlahan tanpa menekuk lutut' },
-        { name: 'Mountain Climbers', desc: 'Tarik lutut ke arah dada secara bergantian' },
-        { name: 'Russian Twist', desc: 'Putar badan ke kiri dan kanan' }
+        { name: 'Plank Hold', desc: 'Tahan posisi tubuh lurus dan kencangkan perut', repOptions: [30s, 45s, 1m, 1,5m, 2m] },
+        { name: 'Crunch', desc: 'Angkat badan setengah sit up', repOptions: [15, 20, 23, 30, 40] },
+        { name: 'Knee Raises', desc: 'Tarik lutut ke arah dada', repOptions: [10, 15, 20, 25, 30] },
+        { name: 'Russian Twist', desc: 'Putar badan ke kiri dan kanan', repOptions: [10, 12, 16, 20, 24] }
       ]
     };
+
 
     // Cek apakah ada tanggal tersimpan di localStorage
 const savedStartDate = localStorage.getItem('workout_start_date');
@@ -831,6 +972,41 @@ if (savedStartDate) {
 
         let actionWidget = '';
         if (completedSets === 3) {
+    // Variable pembantu modal reps
+    const optionColors = ['#F97316', '#EAB308', '#84CC16', '#10B981', '#06B6D4'];
+    let activeModalContext = null;
+
+    function openWorkoutDay(dayNumber, splitName) {
+      selectedDayNumber = dayNumber;
+      document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
+      
+      const container = document.getElementById('exerciseListContainer');
+      container.innerHTML = '';
+
+      const exercises = workoutDatabase[splitName] || workoutDatabase['Pull Day'];
+
+      if (!exerciseState[activeLevelKey]) {
+        exerciseState[activeLevelKey] = {};
+      }
+
+      if (!exerciseState[activeLevelKey][dayNumber]) {
+        exerciseState[activeLevelKey][dayNumber] = {
+          0: [null, null, null],
+          1: [null, null, null],
+          2: [null, null, null],
+          3: [null, null, null]
+        };
+      }
+
+      exercises.forEach((ex, exIndex) => {
+        const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
+        const completedSets = setsData.filter(r => r !== null).length;
+
+        const stack = document.createElement('div');
+        stack.className = 'exercise-stack';
+
+        let actionWidget = '';
+        if (completedSets === 3) {
           actionWidget = `<div class="check-circle" style="background:var(--accent-current); color:#FFF;">✓</div>`;
         } else if (completedSets > 0) {
           const percent = (completedSets / 3) * 100;
@@ -855,11 +1031,11 @@ if (savedStartDate) {
             <div class="layer-set-row">
               <span class="layer-set-label">${setLabels[s]}</span>
               <div class="layer-set-actions">
-                <select class="reps-btn-select" ${isDone ? 'disabled' : ''} onchange="lockReps(${exIndex}, ${s}, this)">
-                  <option value="">Reps</option>
-                  ${repOptions.map(n => `<option value="${n}" ${currentReps == n ? 'selected' : ''}>${n}</option>`).join('')}
-                </select>
-                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(event, ${exIndex}, ${s}, this)">
+                <button class="reps-trigger-btn ${isDone ? 'disabled' : ''}" 
+                        onclick="openRepsModal(event, ${exIndex}, ${s}, '${splitName}')" id="repBtn_${exIndex}_${s}">
+                  ${isDone ? currentReps + ' Reps' : 'Pilih Reps'}
+                </button>
+                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(event, ${exIndex}, ${s}, '${splitName}', this)">
                   ${isDone ? '✓' : ''}
                 </div>
               </div>
@@ -890,24 +1066,101 @@ if (savedStartDate) {
       showPage('page-3');
     }
 
+              function openRepsModal(event, exIndex, setIndex, splitName) {
+      event.stopPropagation();
+      const currentReps = exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex];
+      if (currentReps !== null) return; 
+
+      const exercise = (workoutDatabase[splitName] || workoutDatabase['Pull Day'])[exIndex];
+      const repOptions = exercise.repOptions || [1, 2, 3, 4, 5];
+
+      activeModalContext = { exIndex, setIndex, splitName, selectedVal: null, repOptions };
+
+      const emojiElem = document.getElementById('modalEmoji');
+      const textElem = document.getElementById('modalText');
+      const optionsContainer = document.getElementById('modalOptions');
+      const okBtn = document.getElementById('modalBtnOk');
+
+      emojiElem.innerText = '🤔';
+      emojiElem.style.transform = 'scale(1)';
+      textElem.innerText = 'Kuat berapa nih?';
+      textElem.style.color = '#1E293B';
+      okBtn.classList.remove('active');
+      optionsContainer.innerHTML = '';
+
+      repOptions.forEach((num, idx) => {
+        const color = optionColors[idx % optionColors.length];
+        const chip = document.createElement('div');
+        chip.className = 'rep-chip';
+        chip.style.setProperty('--chip-color', color);
+        chip.innerText = num;
+        chip.onclick = () => selectRepOption(num, idx, color);
+        optionsContainer.appendChild(chip);
+      });
+
+      document.getElementById('repsModal').classList.add('active');
+    }
+
+    function selectRepOption(value, index, color) {
+      activeModalContext.selectedVal = value;
+      
+      const emojiElem = document.getElementById('modalEmoji');
+      const textElem = document.getElementById('modalText');
+      const okBtn = document.getElementById('modalBtnOk');
+      const chips = document.querySelectorAll('.rep-chip');
+
+      chips.forEach((c, i) => {
+        if (i === index) c.classList.add('selected');
+        else c.classList.remove('selected');
+      });
+
+      emojiElem.style.transform = 'scale(1.2)';
+      setTimeout(() => emojiElem.style.transform = 'scale(1)', 150);
+
+      if (index === 0 || index === 1) {
+        emojiElem.innerText = '😅';
+        textElem.innerText = 'yaah, semangat lagi ya';
+      } else if (index === 2 || index === 3) {
+        emojiElem.innerText = '😱';
+        textElem.innerText = 'kite ade peningkatan';
+      } else {
+        emojiElem.innerText = '😏';
+        textElem.innerText = 'otot gw tuh';
+      }
+
+      textElem.style.color = color;
+      okBtn.classList.add('active');
+    }
+
+    function confirmRepsSelection() {
+      if (!activeModalContext || activeModalContext.selectedVal === null) return;
+
+      const { exIndex, setIndex, selectedVal } = activeModalContext;
+      
+      exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = selectedVal;
+      localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
+
+      const triggerBtn = document.getElementById(`repBtn_${exIndex}_${setIndex}`);
+      if (triggerBtn) {
+        triggerBtn.innerText = `${selectedVal} Reps`;
+      }
+
+      document.getElementById('repsModal').classList.remove('active');
+    }
+
     function toggleExpandStack(mainCardElem) {
       const stack = mainCardElem.closest('.exercise-stack');
       stack.classList.toggle('expanded');
-    }
+            }
 
-    function lockReps(exIndex, setIndex, selectElem) {
-      const val = selectElem.value ? parseInt(selectElem.value) : null;
-      exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = val;
-      localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
-    }
-
-    function toggleSetCheck(event, exIndex, setIndex, checkElem) {
-      event.stopPropagation(); // Mencegah pemicuan klik kartu utama
+        function toggleSetCheck(event, exIndex, setIndex, splitName, checkElem) {
+      event.stopPropagation();
       const row = checkElem.closest('.layer-set-row');
-      const select = row.querySelector('.reps-btn-select');
+      const triggerBtn = row.querySelector('.reps-trigger-btn');
+      const currentVal = exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex];
 
-      if (!select.value && !checkElem.classList.contains('checked')) {
-        alert("Pilih jumlah Reps terlebih dahulu!");
+      if (currentVal === null && !checkElem.classList.contains('checked')) {
+        openRepsModal(event, exIndex, setIndex, splitName);
         return;
       }
 
@@ -916,18 +1169,17 @@ if (savedStartDate) {
       if (isChecked) {
         checkElem.classList.remove('checked');
         checkElem.innerText = '';
-        select.disabled = false;
+        triggerBtn.classList.remove('disabled');
+        triggerBtn.innerText = 'Pilih Reps';
         exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = null;
       } else {
         checkElem.classList.add('checked');
         checkElem.innerText = '✓';
-        select.disabled = true;
-        exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = parseInt(select.value);
+        triggerBtn.classList.add('disabled');
       }
 
       localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
 
-      // Update widget progres pada kartu utama secara langsung tanpa mereset kartu
       const stack = checkElem.closest('.exercise-stack');
       const widgetWrapper = stack.querySelector('.action-widget-wrapper');
       const setsData = exerciseState[activeLevelKey][selectedDayNumber][exIndex];
@@ -963,6 +1215,18 @@ if (savedStartDate) {
   navigator.serviceWorker.register('sw.js');
     }
   </script>
-
+  
+<!-- POP-UP MODAL REPS INTERAKTIF -->
+<div class="reps-modal-overlay" id="repsModal">
+  <div class="reps-modal-card">
+    <div class="modal-emoji-wrapper">
+      <span id="modalEmoji" class="modal-emoji">🤔</span>
+    </div>
+    <div id="modalText" class="modal-text">Kuat berapa nih?</div>
+    <div id="modalOptions" class="modal-options-grid"></div>
+    <button class="modal-btn-ok" id="modalBtnOk" onclick="confirmRepsSelection()">OK</button>
+  </div>
+</div>
+  
 </body>
 </html>
