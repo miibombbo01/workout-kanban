@@ -584,7 +584,9 @@
   <script>
     const levelPages = { pemula: 1, menengah: 1, pro: 1 };
     
-    const exerciseState = {
+    // Memuat data dari localStorage agar tersimpan secara permanen
+    const savedData = localStorage.getItem('workout_exercise_state');
+    const exerciseState = savedData ? JSON.parse(savedData) : {
       pemula: {},
       menengah: {},
       pro: {}
@@ -647,6 +649,8 @@
       const pageIndicator = document.getElementById(`page-${level}`);
       const currentPage = levelPages[level];
       
+      if (!rowContainer || !pageIndicator) return;
+
       rowContainer.innerHTML = '';
       const startDay = (currentPage - 1) * 15 + 1;
       const endDay = startDay + 14;
@@ -674,13 +678,13 @@
     }
 
     function isDayFullyCompleted(level, day) {
-      const dayData = exerciseState[level][day];
+      const dayData = exerciseState[level] ? exerciseState[level][day] : null;
       if (!dayData) return false;
       const totalEx = Object.keys(dayData).length;
       if (totalEx < 4) return false;
 
       return Object.values(dayData).every(ex => {
-        return ex.filter(reps => reps !== null).length === 3;
+        return Array.isArray(ex) && ex.filter(reps => reps !== null).length === 3;
       });
     }
 
@@ -700,6 +704,7 @@
 
     function renderWeekGrid(containerId, startDay, endDay) {
       const container = document.getElementById(containerId);
+      if (!container) return;
       container.innerHTML = '';
       
       const startDateVal = document.getElementById('startDatePicker').value;
@@ -713,10 +718,12 @@
         const splitIndex = (day - 1) % 3;
         const currentSplit = splitRotation[splitIndex];
 
-        const dayData = exerciseState[activeLevelKey][day] || {};
+        const dayData = (exerciseState[activeLevelKey] && exerciseState[activeLevelKey][day]) || {};
         let totalSetsCompleted = 0;
         Object.values(dayData).forEach(ex => {
-          totalSetsCompleted += ex.filter(reps => reps !== null).length;
+          if (Array.isArray(ex)) {
+            totalSetsCompleted += ex.filter(reps => reps !== null).length;
+          }
         });
 
         const maxSets = 12;
@@ -748,4 +755,157 @@
 
         htmlContent += `
           <div class="focus-box">
-            <img src="${currentSplit.iconImg}" class="focus-icon-i
+            <img src="${currentSplit.iconImg}" class="focus-icon-img" alt="${currentSplit.label}">
+            <span class="focus-label">${currentSplit.label}</span>
+          </div>
+          <div class="workout-count">4 Latihan</div>
+        `;
+
+        board.innerHTML = htmlContent;
+        container.appendChild(board);
+      }
+    }
+
+    function openWorkoutDay(dayNumber, splitName) {
+      selectedDayNumber = dayNumber;
+      document.getElementById('workoutDayTitle').innerText = `Latihan Hari Ke-${dayNumber}`;
+      
+      const container = document.getElementById('exerciseListContainer');
+      container.innerHTML = '';
+
+      const exercises = workoutDatabase[splitName] || workoutDatabase['Pull Day'];
+
+      if (!exerciseState[activeLevelKey]) {
+        exerciseState[activeLevelKey] = {};
+      }
+
+      if (!exerciseState[activeLevelKey][dayNumber]) {
+        exerciseState[activeLevelKey][dayNumber] = {
+          0: [null, null, null],
+          1: [null, null, null],
+          2: [null, null, null],
+          3: [null, null, null]
+        };
+      }
+
+      exercises.forEach((ex, exIndex) => {
+        const setsData = exerciseState[activeLevelKey][dayNumber][exIndex] || [null, null, null];
+        const completedSets = setsData.filter(r => r !== null).length;
+
+        const stack = document.createElement('div');
+        stack.className = 'exercise-stack';
+
+        let actionWidget = '';
+        if (completedSets === 3) {
+          actionWidget = `<div class="check-circle" style="background:var(--accent-current); color:#FFF;">✓</div>`;
+        } else if (completedSets > 0) {
+          const percent = (completedSets / 3) * 100;
+          const deg = (percent / 100) * 360;
+          actionWidget = `
+            <div class="progress-circle" style="--progress-deg: ${deg}deg;">
+              <div class="progress-circle-inner">${completedSets}/3</div>
+            </div>
+          `;
+        } else {
+          actionWidget = `<button class="status-btn" style="padding: 6px 14px; width: auto;">Mulai</button>`;
+        }
+
+        const setLabels = ['Set pertama', 'Set kedua', 'Set ketiga'];
+        let layerRowsHTML = '';
+
+        for (let s = 0; s < 3; s++) {
+          const currentReps = setsData[s];
+          const isDone = currentReps !== null;
+
+          layerRowsHTML += `
+            <div class="layer-set-row">
+              <span class="layer-set-label">${setLabels[s]}</span>
+              <div class="layer-set-actions">
+                <select class="reps-btn-select" ${isDone ? 'disabled' : ''} onchange="lockReps(${exIndex}, ${s}, this)">
+                  <option value="">Reps</option>
+                  ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}" ${currentReps == n ? 'selected' : ''}>${n}</option>`).join('')}
+                </select>
+                <div class="layer-circle-checkbox ${isDone ? 'checked' : ''}" onclick="toggleSetCheck(${exIndex}, ${s}, this)">
+                  ${isDone ? '✓' : ''}
+                </div>
+              </div>
+            </div>
+          `;
+
+          if (s < 2) {
+            layerRowsHTML += `<div class="layer-divider"></div>`;
+          }
+        }
+
+        stack.innerHTML = `
+          <div class="exercise-main-card" onclick="toggleExpandStack(this)">
+            <div class="exercise-info">
+              <h4>${ex.name}</h4>
+              <p>${ex.desc}</p>
+            </div>
+            <div>${actionWidget}</div>
+          </div>
+          <div class="exercise-layer-card">
+            ${layerRowsHTML}
+          </div>
+        `;
+
+        container.appendChild(stack);
+      });
+
+      showPage('page-3');
+    }
+
+    function toggleExpandStack(mainCardElem) {
+      const stack = mainCardElem.closest('.exercise-stack');
+      stack.classList.toggle('expanded');
+    }
+
+    function lockReps(exIndex, setIndex, selectElem) {
+      const val = selectElem.value ? parseInt(selectElem.value) : null;
+      exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = val;
+      localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
+    }
+
+    function toggleSetCheck(exIndex, setIndex, checkElem) {
+      const row = checkElem.closest('.layer-set-row');
+      const select = row.querySelector('.reps-btn-select');
+
+      if (!select.value && !checkElem.classList.contains('checked')) {
+        alert("Pilih jumlah Reps terlebih dahulu!");
+        return;
+      }
+
+      if (checkElem.classList.contains('checked')) {
+        checkElem.classList.remove('checked');
+        checkElem.innerText = '';
+        select.disabled = false;
+        exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = null;
+      } else {
+        checkElem.classList.add('checked');
+        checkElem.innerText = '✓';
+        select.disabled = true;
+        exerciseState[activeLevelKey][selectedDayNumber][exIndex][setIndex] = parseInt(select.value);
+      }
+
+      localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
+
+      const splitIndex = (selectedDayNumber - 1) % 3;
+      openWorkoutDay(selectedDayNumber, splitRotation[splitIndex].label);
+    }
+
+    function saveExerciseProgress() {
+      localStorage.setItem('workout_exercise_state', JSON.stringify(exerciseState));
+      renderDots(activeLevelKey);
+      updateProgramDates();
+      showPage('page-2');
+    }
+
+    // Inisialisasi awal saat halaman pertama kali dibuka
+    renderDots('pemula');
+    renderDots('menengah');
+    renderDots('pro');
+  </script>
+
+</body>
+</html>
