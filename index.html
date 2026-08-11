@@ -652,6 +652,17 @@
   opacity: 0.8;
   cursor: default;
       }
+
+    /* Modal Kunci Level */
+.lock-modal-card {
+  border: 2px solid #EF4444 !important; /* Stroke Merah */
+}
+
+.lock-btn-ok {
+  background: #EF4444 !important; /* Tombol Merah */
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
   </style>
   <link rel="manifest" href="manifest.json">
 </head>
@@ -1191,6 +1202,19 @@ function openRepsModal(event, exIndex, setIndex, splitName) {
     <div id="modalText" class="modal-text">Kuat berapa nih?</div>
     <div id="modalOptions" class="modal-options-grid"></div>
     <button class="modal-btn-ok" id="modalBtnOk" onclick="confirmRepsSelection()">OK</button>
+  </div>
+</div>
+
+<!-- POP-UP MODAL KUNCI LEVEL -->
+<div class="reps-modal-overlay" id="lockModal">
+  <div class="reps-modal-card lock-modal-card">
+    <div class="modal-emoji-wrapper">
+      <span class="modal-emoji">⚠️</span>
+    </div>
+    <div class="modal-text" style="color: #EF4444; font-size: 14px; margin-top: 28px;">
+      Akan hadir di update selanjutnya, kalo ga malas
+    </div>
+    <button class="modal-btn-ok lock-btn-ok" onclick="closeLockModal()">OK</button>
   </div>
 </div>
 </body>
