@@ -1191,6 +1191,14 @@ function openRepsModal(event, exIndex, setIndex, splitName) {
     if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
     }
+
+    function openLockModal() {
+  document.getElementById('lockModal').classList.add('active');
+}
+
+function closeLockModal() {
+  document.getElementById('lockModal').classList.remove('active');
+}
   </script>
   
 <!-- POP-UP MODAL REPS INTERAKTIF -->
